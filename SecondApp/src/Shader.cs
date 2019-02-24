@@ -67,5 +67,15 @@ namespace SecondApp
             }
             GL.Uniform1(location, value);
         }
+
+        public void SetMatrix4(string name, Matrix4 matrix)
+        {
+            int location = GL.GetUniformLocation(shaderProgram, name);
+            if (location == -1)
+            {
+                Console.WriteLine("shader.SetMatrix4 greska");
+            }
+            GL.UniformMatrix4(location, false, ref matrix);
+        }
     }
 }
