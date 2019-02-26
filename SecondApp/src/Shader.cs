@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
@@ -7,6 +8,7 @@ namespace SecondApp
     public class Shader
     {
         int shaderProgram;
+        private Dictionary<string, int> uniformCache;
 
         public Shader(string vertexPath, string fragmentPath)
         {
@@ -46,6 +48,8 @@ namespace SecondApp
             GL.DetachShader(shaderProgram, fragmentShader);
             GL.DeleteShader(vertexShader);
             GL.DeleteShader(fragmentShader);
+
+            uniformCache = new Dictionary<string, int>();
         }
 
         public int GetHandle()
@@ -60,22 +64,45 @@ namespace SecondApp
 
         public void SetInt(string name, int value)
         {
-            int location = GL.GetUniformLocation(shaderProgram, name);
-            if(location == -1)
+            int location = GetCachedUniformLocation(name);
+            if (location == -1)
             {
                 Console.WriteLine("shader.SetInt greska");
             }
             GL.Uniform1(location, value);
         }
 
+        public void SetVec3(string name, Vector3 value)
+        {
+            int location = GetCachedUniformLocation(name);
+            if (location == -1)
+            {
+                Console.WriteLine("shader.SetVec3 greska");
+            }
+            GL.Uniform3(location, value);
+        }
+
         public void SetMatrix4(string name, Matrix4 matrix)
         {
-            int location = GL.GetUniformLocation(shaderProgram, name);
+            int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
                 Console.WriteLine("shader.SetMatrix4 greska");
             }
             GL.UniformMatrix4(location, false, ref matrix);
+        }
+
+
+        private int GetCachedUniformLocation(string name)
+        {
+            int result;
+            if (uniformCache.TryGetValue(name, out result))
+            {
+                return result;
+            }
+            result = GL.GetUniformLocation(shaderProgram, name);
+            uniformCache.Add(name, result);
+            return result;
         }
     }
 }

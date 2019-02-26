@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SecondApp
 {
-    class GameObject
+    class Cube : GameObjectInterface
     {
         private float[] Vertices { get; set; }
         private uint[] Indices { get; set; }
@@ -20,7 +20,7 @@ namespace SecondApp
             }
         }
         private Matrix4 Model { get; set; }
-        private Shader Shader { get; set; }
+        public Shader Shader { get; set; }
 
         private List<Texture> _textures;
         private List<Texture> Textures {
@@ -38,12 +38,12 @@ namespace SecondApp
             }
         }
 
-        private int VAO { get; set; }
+        public int VAO { get; set; }
         private int VBO { get; set; }
         private int EBO { get; set; }
 
 
-        public GameObject(float[] vertices, uint[] indices, Vector3 position, Shader shader, List<Texture> textures)
+        public Cube(float[] vertices, uint[] indices, Vector3 position, Shader shader, List<Texture> textures)
         {
             Vertices = vertices;
             Indices = indices;
@@ -70,17 +70,21 @@ namespace SecondApp
             int vertexAttribTexCoord = GL.GetAttribLocation(Shader.GetHandle(), "aTexCoord");
             GL.VertexAttribPointer(vertexAttribTexCoord, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
             GL.EnableVertexAttribArray(vertexAttribTexCoord);
-            
         }
 
-        public void Draw()
+        public void Draw(Matrix4 viewMatrix)
         {
-            //GL.BindVertexArray(VAO);
-            //Shader.Use();
+            GL.BindVertexArray(VAO);
+            Shader.Use();
             Shader.SetMatrix4("model", Model);
+            Shader.SetMatrix4("view", viewMatrix);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
         }
 
-
+        public void DrawBatched()
+        {
+            Shader.SetMatrix4("model", Model);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+        }
     }
 }

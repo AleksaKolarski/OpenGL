@@ -12,9 +12,12 @@ namespace SecondApp
 
         private double broj = 0;
 
-        List<GameObject> cubes;
+        Line lineX, lineY, lineZ;
+        Shader lineShader;
 
-        Shader shader;
+        List<GameObjectInterface> cubes;
+        DrawBatcher cubeBatcher;
+        Shader cubeShader;
         Texture textureContainer;
         Texture textureFace;
 
@@ -103,7 +106,27 @@ namespace SecondApp
             GL.ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
 
-            shader = new Shader("shader.vert", "shader.frag");
+            lineShader = new Shader("LineShader.vert", "LineShader.frag");
+            float[] lineXVertices =
+            {
+                0.0f, 0.0f, 0.0f,
+                100.0f, 0.0f, 0.0f
+            };
+            float[] lineYVertices =
+            {
+                0.0f, 0.0f, 0.0f,
+                0.0f, 100.0f, 0.0f
+            };
+            float[] lineZVertices =
+            {
+                0.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 100.0f
+            };
+            lineX = new Line(lineXVertices, new Vector3(0.0f, 0.0f, 0.0f), lineShader, new Vector3(1.0f, 0.0f, 0.0f));
+            lineY = new Line(lineYVertices, new Vector3(0.0f, 0.0f, 0.0f), lineShader, new Vector3(0.0f, 1.0f, 0.0f));
+            lineZ = new Line(lineZVertices, new Vector3(0.0f, 0.0f, 0.0f), lineShader, new Vector3(0.0f, 0.0f, 1.0f));
+
+            cubeShader = new Shader("shader.vert", "shader.frag");
 
             textureContainer = new Texture("container.png");
             textureFace = new Texture("awesomeface.png");
@@ -111,26 +134,28 @@ namespace SecondApp
             List<Texture> textures = new List<Texture>();
             textures.Add(textureContainer);
             textures.Add(textureFace);
-            cubes = new List<GameObject>();
-            for(int i = -180; i < 180; i += 2)
+            cubes = new List<GameObjectInterface>();
+            for(int i = 0; i < 40; i += 1)
             {
-                //for(int j = 0; j < 1; j += 2)
-                //{
-                    for (int k = -180; k < 180; k += 2)
+                for (int j = 0; j < 40; j += 1)
+                {
+                    for (int k = 0; k < 40; k += 1)
                     {
-                        cubes.Add(new GameObject(vertices, indices, new Vector3(
-                            (float)i, 
-                            ((float)Math.Sin(MathHelper.DegreesToRadians(i*5)) * 25.0f + (float)Math.Cos(MathHelper.DegreesToRadians(k*5)) * 25.0f), (float)k), shader, textures));
+                        //cubes.Add(new Cube(vertices, indices, new Vector3((float)i, ((float)Math.Sin(MathHelper.DegreesToRadians(i*5)) * 25.0f + (float)Math.Cos(MathHelper.DegreesToRadians(k*5)) * 25.0f), (float)k), cubeShader, textures));
+                        cubes.Add(new Cube(vertices, indices, new Vector3(i, j, k), cubeShader, textures));
                     }
-                //}
+                }
             }
+            cubeBatcher = new DrawBatcher(cubes);
 
-            shader.Use();
             Matrix4 projectionMatrix = Matrix4.Identity;
             projectionMatrix *= Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)Width/Height, 0.01f, 1000.0f);
-            shader.SetMatrix4("projection", projectionMatrix);
+            cubeShader.Use();
+            cubeShader.SetMatrix4("projection", projectionMatrix);
+            lineShader.Use();
+            lineShader.SetMatrix4("projection", projectionMatrix);
 
-            camera = new Camera(new Vector3(0.0f, 150.0f, 7.0f), new Vector3(0.0f, 1.0f, 0.0f), new Vector3( 0.0f, 0.0f, -1.0f), 0.0f, -90.0f, 32.5f, 0.12f);
+            camera = new Camera(new Vector3(0.0f, 50.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), new Vector3( 0.0f, 0.0f, -1.0f), 0.0f, 0.0f, 32.5f, 0.12f);
 
             GL.Viewport(ClientRectangle);
 
@@ -179,13 +204,13 @@ namespace SecondApp
 
             Matrix4 viewMatrix;
             viewMatrix = camera.GetViewMatrix();
-            shader.SetMatrix4("view", viewMatrix);
 
-            foreach(GameObject cube in cubes)
-            {
-                cube.Draw();
-            }
-            
+
+            lineX.Draw(viewMatrix);
+            lineY.Draw(viewMatrix);
+            lineZ.Draw(viewMatrix);
+
+            cubeBatcher.Draw(viewMatrix);
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);

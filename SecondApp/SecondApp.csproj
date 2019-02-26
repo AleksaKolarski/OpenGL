@@ -76,8 +76,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Camera.cs" />
-    <Compile Include="src\GameObject.cs" />
+    <Compile Include="src\Cube.cs" />
+    <Compile Include="src\DrawBatcher.cs" />
+    <Compile Include="src\GameObjectInterface.cs" />
     <Compile Include="src\Keyboard.cs" />
+    <Compile Include="src\Line.cs" />
     <Compile Include="src\Mouse.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -98,6 +101,12 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="res\shaders\LineShader.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="res\shaders\LineShader.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="res\shaders\shader.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
