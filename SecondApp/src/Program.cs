@@ -11,10 +11,10 @@ namespace SecondApp
         static Game game;
         static void Main(string[] args)
         {
-            game = new Game(1600, 900, "igra");
+            game = new Game(1920, 1080, "igra");
 
             game.VSync = OpenTK.VSyncMode.On;
-            game.WindowState = OpenTK.WindowState.Normal;
+            game.WindowState = OpenTK.WindowState.Fullscreen;
             game.CursorVisible = false;
             game.Run();
         }

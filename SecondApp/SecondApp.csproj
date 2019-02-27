@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="src\Camera.cs" />
     <Compile Include="src\Cube.cs" />
+    <Compile Include="src\CubeLight.cs" />
     <Compile Include="src\DrawBatcher.cs" />
     <Compile Include="src\GameObjectInterface.cs" />
     <Compile Include="src\Keyboard.cs" />
@@ -102,16 +103,22 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="res\shaders\CubeLightShader.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="res\shaders\CubeLightShader.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="res\shaders\LineShader.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="res\shaders\LineShader.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="res\shaders\shader.frag">
+    <None Include="res\shaders\CubeShader.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="res\shaders\shader.vert">
+    <None Include="res\shaders\CubeShader.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

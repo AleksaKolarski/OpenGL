@@ -1,9 +1,4 @@
 ﻿using OpenTK.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SecondApp
 {
@@ -40,6 +35,11 @@ namespace SecondApp
         public static int offsetY()
         {
             return previousState.Y - currentState.Y;
+        }
+
+        public static float scrollOffset()
+        {
+            return currentState.WheelPrecise - previousState.WheelPrecise;
         }
     }
 }

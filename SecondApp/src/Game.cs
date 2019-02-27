@@ -21,52 +21,100 @@ namespace SecondApp
         Texture textureContainer;
         Texture textureFace;
 
+        Shader cubeLightShader;
+        CubeLight cubeLight1, cubeLight2;
+
         Camera camera;
 
-        float[] vertices =
+        float[] cubeVertices =
         {
-            // positions         // texture coords
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+            // positions         // tex coords  // normals
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,  0.0f,  0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  0.0f, -1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
 
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  0.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  0.0f, 1.0f,
 
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f,  0.0f,  0.0f,
 
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  0.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  1.0f,  0.0f,  0.0f,
 
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
 
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  1.0f,  0.0f
+        };
+
+        float[] cubeLightVertices =
+        {
+            -0.5f, -0.5f, -0.5f,  
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            -0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+
+            -0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            -0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f, -0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f
         };
 
         Vector3[] cubePositions =
@@ -126,7 +174,7 @@ namespace SecondApp
             lineY = new Line(lineYVertices, new Vector3(0.0f, 0.0f, 0.0f), lineShader, new Vector3(0.0f, 1.0f, 0.0f));
             lineZ = new Line(lineZVertices, new Vector3(0.0f, 0.0f, 0.0f), lineShader, new Vector3(0.0f, 0.0f, 1.0f));
 
-            cubeShader = new Shader("shader.vert", "shader.frag");
+            cubeShader = new Shader("CubeShader.vert", "CubeShader.frag");
 
             textureContainer = new Texture("container.png");
             textureFace = new Texture("awesomeface.png");
@@ -135,27 +183,38 @@ namespace SecondApp
             textures.Add(textureContainer);
             textures.Add(textureFace);
             cubes = new List<GameObjectInterface>();
-            for(int i = 0; i < 40; i += 1)
+            int x = 100;
+            for(int i = -x; i <= x; i += 1)
             {
-                for (int j = 0; j < 40; j += 1)
-                {
-                    for (int k = 0; k < 40; k += 1)
+                //for (int j = 0; j <= x; j += 1)
+                //{
+                    for (int k = -x; k <= x; k += 1)
                     {
-                        //cubes.Add(new Cube(vertices, indices, new Vector3((float)i, ((float)Math.Sin(MathHelper.DegreesToRadians(i*5)) * 25.0f + (float)Math.Cos(MathHelper.DegreesToRadians(k*5)) * 25.0f), (float)k), cubeShader, textures));
-                        cubes.Add(new Cube(vertices, indices, new Vector3(i, j, k), cubeShader, textures));
+                        cubes.Add(new Cube(cubeVertices, new Vector3((float)i, ((float)Math.Sin(MathHelper.DegreesToRadians(i* 10 + 90)) * 5.0f + (float)Math.Cos(MathHelper.DegreesToRadians(k*10)) * 5.0f) -10.0f, (float)k), cubeShader, textures));
+
+                        //if(i == 0 || i == x || j == 0 || j == x || k == 0 || k == x)
+                            //cubes.Add(new Cube(cubeVertices, new Vector3(i, 1, k), cubeShader, textures));
                     }
-                }
+                //}
             }
             cubeBatcher = new DrawBatcher(cubes);
+
+            cubeLightShader = new Shader("CubeLightShader.vert", "CubeLightShader.frag");
+            cubeLight1 = new CubeLight(cubeLightVertices, new Vector3(4.0f, 2.0f, 4.0f), cubeLightShader);
+            //cubeLight2 = new CubeLight(cubeLightVertices, new Vector3(0.0f, 0.0f, 4.0f), cubeLightShader);
+
 
             Matrix4 projectionMatrix = Matrix4.Identity;
             projectionMatrix *= Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), (float)Width/Height, 0.01f, 1000.0f);
             cubeShader.Use();
             cubeShader.SetMatrix4("projection", projectionMatrix);
+            cubeShader.SetVec3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
             lineShader.Use();
             lineShader.SetMatrix4("projection", projectionMatrix);
+            cubeLightShader.Use();
+            cubeLightShader.SetMatrix4("projection", projectionMatrix);
 
-            camera = new Camera(new Vector3(0.0f, 50.0f, 0.0f), new Vector3(0.0f, 1.0f, 0.0f), new Vector3( 0.0f, 0.0f, -1.0f), 0.0f, 0.0f, 32.5f, 0.12f);
+            camera = new Camera(new Vector3(4.0f, 4.0f, 4.0f), new Vector3(0.0f, 1.0f, 0.0f), -135.0f, -35.0f, 45.0f, 32.5f, 0.12f);
 
             GL.Viewport(ClientRectangle);
 
@@ -165,13 +224,13 @@ namespace SecondApp
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
+
+            broj += e.Time * 3;
+            cubeLight1.Position = new Vector3( (float)Math.Sin(broj) * 100, 40.0f, (float)Math.Cos(broj) * 100);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
 
             Keyboard.updateState();
             if (Keyboard.checkKey(Key.W))
@@ -195,20 +254,37 @@ namespace SecondApp
                 Exit();
             }
 
-
             if (Focused)
             {
                 Mouse.updateState(Width, Height);
-                camera.ProcessMouseMovement(Mouse.offsetX(), Mouse.offsetY());
+                camera.ProcessMouseMovement(Mouse.offsetX(), Mouse.offsetY(), Mouse.scrollOffset());
+
+                Matrix4 projectionMatrix = Matrix4.Identity;
+                projectionMatrix *= Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(camera.fov), (float)Width / Height, 0.1f, 1000.0f);
+                cubeShader.Use();
+                cubeShader.SetMatrix4("projection", projectionMatrix);
+                cubeShader.SetVec3("viewPos", camera.position);
+                cubeShader.SetVec3("lightPos", cubeLight1.Position);
+                lineShader.Use();
+                lineShader.SetMatrix4("projection", projectionMatrix);
+                cubeLightShader.Use();
+                cubeLightShader.SetMatrix4("projection", projectionMatrix);
             }
+
 
             Matrix4 viewMatrix;
             viewMatrix = camera.GetViewMatrix();
 
 
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
             lineX.Draw(viewMatrix);
             lineY.Draw(viewMatrix);
             lineZ.Draw(viewMatrix);
+
+            cubeLight1.Draw(viewMatrix);
+            //cubeLight2.Draw(viewMatrix);
 
             cubeBatcher.Draw(viewMatrix);
 

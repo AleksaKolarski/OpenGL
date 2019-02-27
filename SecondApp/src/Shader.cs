@@ -52,6 +52,14 @@ namespace SecondApp
             uniformCache = new Dictionary<string, int>();
         }
 
+        public Shader(string vertexPath, string fragmentPath, List<string> uniformNames) : this(vertexPath, fragmentPath)
+        {
+            foreach(string uniformName in uniformNames)
+            {
+                uniformCache.Add(uniformName, GL.GetUniformLocation(shaderProgram, uniformName));
+            }
+        }
+
         public int GetHandle()
         {
             return shaderProgram;
@@ -67,7 +75,7 @@ namespace SecondApp
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
-                Console.WriteLine("shader.SetInt greska");
+                Console.WriteLine("shader.SetInt("+name+", "+value+") greska");
             }
             GL.Uniform1(location, value);
         }
@@ -77,19 +85,19 @@ namespace SecondApp
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
-                Console.WriteLine("shader.SetVec3 greska");
+                Console.WriteLine("shader.SetVec3(" + name + ", " + value + ") greska");
             }
             GL.Uniform3(location, value);
         }
 
-        public void SetMatrix4(string name, Matrix4 matrix)
+        public void SetMatrix4(string name, Matrix4 value)
         {
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
-                Console.WriteLine("shader.SetMatrix4 greska");
+                Console.WriteLine("shader.SetMatrix4(" + name + ", " + value + ") greska");
             }
-            GL.UniformMatrix4(location, false, ref matrix);
+            GL.UniformMatrix4(location, false, ref value);
         }
 
 

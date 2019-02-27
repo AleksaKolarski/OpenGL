@@ -18,7 +18,7 @@ namespace SecondApp
             RIGHT
         }
 
-        Vector3 position;
+        public Vector3 position;
         Vector3 front;
         Vector3 up;
         Vector3 right;
@@ -28,28 +28,16 @@ namespace SecondApp
         float pitch;
         float speed;
         float sensitivity;
+        public float fov;
 
         // vector init
-        public Camera(Vector3 position, Vector3 up, Vector3 front, float yaw, float pitch, float speed, float sensitivity)
+        public Camera(Vector3 position, Vector3 worldUp, float yaw, float pitch, float fov, float speed, float sensitivity)
         {
             this.position = position;
-            this.worldUp = up;
-            this.front = front;
+            this.worldUp = worldUp;
             this.yaw = yaw;
             this.pitch = pitch;
-            this.speed = speed;
-            this.sensitivity = sensitivity;
-            updateCameraVectors();
-        }
-
-        // scalar init
-        public Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float frontX, float frontY, float frontZ, float yaw, float pitch, float speed, float sensitivity)
-        {
-            this.position = new Vector3(posX, posY, posZ);
-            this.worldUp = new Vector3(upX, upY, upZ);
-            this.front = new Vector3(frontX, frontY, frontZ);
-            this.yaw = yaw;
-            this.pitch = pitch;
+            this.fov = fov;
             this.speed = speed;
             this.sensitivity = sensitivity;
             updateCameraVectors();
@@ -75,31 +63,36 @@ namespace SecondApp
                 position += right * velocity;
         }
 
-        public void ProcessMouseMovement(float xOffset, float yOffset)
+        public void ProcessMouseMovement(float xOffset, float yOffset, float scrollOffset)
         {
+            if (fov >= 1.0f && fov <= 45.0f)
+                fov -= scrollOffset;
+            if (fov <= 1.0f)
+                fov = 1.0f;
+            if (fov >= 45.0f)
+                fov = 45.0f;
+
             xOffset *= sensitivity;
             yOffset *= sensitivity;
 
-            yaw += xOffset;
-            pitch += yOffset;
+            float fovCompensation = (fov / 45.0f);
+            yaw += xOffset * fovCompensation;
+            pitch += yOffset * fovCompensation;
 
-            if (pitch > 89.9f)
-                pitch = 89.9f;
-            if (pitch < -89.9f)
-                pitch = -89.9f;
+            if (pitch > 89.999f)
+                pitch = 89.999f;
+            if (pitch < -89.999f)
+                pitch = -89.999f;
 
             updateCameraVectors();
         }
 
-        private void updateCameraVectors()
+        public void updateCameraVectors()
         {
-            // Calculate the new Front vector
-            Vector3 _front = new Vector3();
-            _front.X = (float)Math.Cos(MathHelper.DegreesToRadians(pitch)) * (float)Math.Cos(MathHelper.DegreesToRadians(yaw));
-            _front.Y = (float)Math.Sin(MathHelper.DegreesToRadians(pitch));
-            _front.Z = (float)Math.Cos(MathHelper.DegreesToRadians(pitch)) * (float)Math.Sin(MathHelper.DegreesToRadians(yaw));
-            front = Vector3.Normalize(_front);
-            // Also re-calculate the Right and Up vector
+            front.X = (float)Math.Cos(MathHelper.DegreesToRadians(pitch)) * (float)Math.Cos(MathHelper.DegreesToRadians(yaw));
+            front.Y = (float)Math.Sin(MathHelper.DegreesToRadians(pitch));
+            front.Z = (float)Math.Cos(MathHelper.DegreesToRadians(pitch)) * (float)Math.Sin(MathHelper.DegreesToRadians(yaw));
+            front = Vector3.Normalize(front);
             right = Vector3.Normalize(Vector3.Cross(front, worldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
             up = Vector3.Normalize(Vector3.Cross(right, front));
         }
