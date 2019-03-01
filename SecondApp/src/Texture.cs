@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace SecondApp
 {
-    class Texture
+    public class Texture
     {
-        int texture;
+        public int texture;
 
         public Texture(string path)
         {
@@ -20,6 +20,7 @@ namespace SecondApp
             Use();
 
             Image<Rgba32> image = Image.Load("res/textures/" + path);
+            //Image<Rgba32> image = Image.Load(path);
             image.Mutate(x => x.Flip(FlipMode.Vertical));
             Rgba32[] tempPixels = image.GetPixelSpan().ToArray();
             List<byte> pixels = new List<byte>();

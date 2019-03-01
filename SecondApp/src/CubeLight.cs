@@ -13,6 +13,7 @@ namespace SecondApp
             get { return _position; }
             set { _position = value;
                 Model = Matrix4.Identity;
+                //Model *= Matrix4.CreateScale(0.2f);
                 Model *= Matrix4.CreateTranslation(value);
             }
         }

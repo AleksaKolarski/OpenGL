@@ -19,7 +19,7 @@ namespace SecondApp
         }
 
         public Vector3 position;
-        Vector3 front;
+        public Vector3 front;
         Vector3 up;
         Vector3 right;
         Vector3 worldUp;

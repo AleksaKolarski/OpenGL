@@ -6,6 +6,8 @@ namespace SecondApp
 {
     class Cube : GameObjectInterface
     {
+        private int textureCount = 0;
+
         private float[] Vertices { get; set; }
         private Vector3 _position;
         public Vector3 Position {
@@ -21,32 +23,15 @@ namespace SecondApp
         private Matrix4 Model { get; set; }
         public Shader Shader { get; set; }
 
-        private List<Texture> _textures;
-        private List<Texture> Textures {
-            get {
-                return _textures;
-            }
-            set {
-                _textures = value;
-                Shader.Use();
-                for (int i = 0; i < _textures.Count; i++)
-                {
-                    _textures[i].Use(TextureUnit.Texture0 + i);
-                    Shader.SetInt("texture" + (i + 1), i);
-                }
-            }
-        }
-
         public int VAO { get; set; }
         private int VBO { get; set; }
 
 
-        public Cube(float[] vertices, Vector3 position, Shader shader, List<Texture> textures)
+        public Cube(float[] vertices, Vector3 position, Shader shader)
         {
             Vertices = vertices;
             Shader = shader;
             Position = position;
-            Textures = textures;
 
             VAO = GL.GenVertexArray();
             VBO = GL.GenBuffer();
@@ -60,13 +45,13 @@ namespace SecondApp
             GL.VertexAttribPointer(vertexAttribLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
             GL.EnableVertexAttribArray(vertexAttribLocation);
 
-            int vertexAttribTexCoord = GL.GetAttribLocation(Shader.GetHandle(), "aTexCoord");
-            GL.VertexAttribPointer(vertexAttribTexCoord, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
-            GL.EnableVertexAttribArray(vertexAttribTexCoord);
-
             vertexAttribLocation = GL.GetAttribLocation(Shader.GetHandle(), "aNormal");
-            GL.VertexAttribPointer(vertexAttribLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 5 * sizeof(float));
+            GL.VertexAttribPointer(vertexAttribLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
             GL.EnableVertexAttribArray(vertexAttribLocation);
+
+            int vertexAttribTexCoord = GL.GetAttribLocation(Shader.GetHandle(), "aTexCoords");
+            GL.VertexAttribPointer(vertexAttribTexCoord, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
+            GL.EnableVertexAttribArray(vertexAttribTexCoord);
         }
 
         public void Rotate(float angle)

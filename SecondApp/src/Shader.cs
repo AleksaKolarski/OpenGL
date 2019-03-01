@@ -9,6 +9,7 @@ namespace SecondApp
     {
         int shaderProgram;
         private Dictionary<string, int> uniformCache;
+        private int textureCount = 0;
 
         public Shader(string vertexPath, string fragmentPath)
         {
@@ -70,12 +71,29 @@ namespace SecondApp
             GL.UseProgram(shaderProgram);
         }
 
+        public void AddTexture(Texture texture, string target)
+        {
+            texture.Use(TextureUnit.Texture0 + textureCount);
+            SetInt(target, textureCount);
+            textureCount++;
+        }
+
         public void SetInt(string name, int value)
         {
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
                 Console.WriteLine("shader.SetInt("+name+", "+value+") greska");
+            }
+            GL.Uniform1(location, value);
+        }
+
+        public void SetFloat(string name, float value)
+        {
+            int location = GetCachedUniformLocation(name);
+            if (location == -1)
+            {
+                Console.WriteLine("shader.SetFloat(" + name + ", " + value + ") greska");
             }
             GL.Uniform1(location, value);
         }
