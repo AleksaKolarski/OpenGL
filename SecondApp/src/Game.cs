@@ -12,8 +12,9 @@ namespace SecondApp
 
         private double broj = 0;
 
-        Model model;
+        Model nanosuit;
         Shader shader;
+        Shader outlineShader;
 
         Model sponza;
         Model lopta;
@@ -70,7 +71,25 @@ namespace SecondApp
             -0.5f,  0.5f, -0.5f
         };
 
-        public Game(int width, int height, string title) : base(width, height, GraphicsMode.Default, title) { }
+        private static OpenTK.Graphics.GraphicsMode GraphicsMode
+        {
+            get {
+                var defaultMode = OpenTK.Graphics.GraphicsMode.Default;
+                var custom = new OpenTK.Graphics.GraphicsMode(
+                    defaultMode.ColorFormat,
+                    defaultMode.Depth,
+                    1, // enable stencil buffer
+                    defaultMode.Samples,
+                    defaultMode.ColorFormat,
+                    defaultMode.Buffers,
+                    defaultMode.Stereo);
+
+                return custom;
+
+            }
+        }
+
+        public Game(int width, int height, string title) : base(width, height, Game.GraphicsMode, title, GameWindowFlags.Default) { }
 
 
         protected override void OnLoad(EventArgs e)
@@ -78,8 +97,9 @@ namespace SecondApp
             // podesavamo boju na koju ce GL.Clear koristiti
             GL.ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             GL.Enable(EnableCap.DepthTest);
-            //GL.DepthMask(true);
-            //GL.DepthFunc(DepthFunction.Less);
+            GL.DepthFunc(DepthFunction.Less);
+            GL.Enable(EnableCap.StencilTest);
+            GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
 
             lineShader = new Shader("LineShader.vert", "LineShader.frag");
             float[] lineXVertices =
@@ -103,14 +123,15 @@ namespace SecondApp
 
             camera = new Camera(new Vector3(0.0f, 10.0f, 15.0f), new Vector3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f, 20.5f, 0.12f);
 
-            model = new Model("res/models/nanosuit.obj");
+            nanosuit = new Model("res/models/nanosuit.obj");
             shader = new Shader("ModelShader.vert", "ModelShader.frag");
+            outlineShader = new Shader("OutlineShader.vert", "OutlineShader.frag");
 
             sponza = new Model("res/models/sponza/sponza.obj");
             sponza.Scale(0.1f);
-            lopta = new Model("res/models/lopta/blenderLopta.obj");
-            lopta.Scale(3);
-            lopta.Translate(new Vector3(0, 10, 0));
+            //lopta = new Model("res/models/lopta/blenderLopta.obj");
+            //lopta.Scale(3);
+            //lopta.Translate(new Vector3(0, 10, 0));
 
             cubeLightShader = new Shader("CubeLightShader.vert", "CubeLightShader.frag");
             cubeLight1 = new CubeLight(cubeLightVertices, new Vector3(1.2f, 1.0f, 2.0f), cubeLightShader);
@@ -134,17 +155,17 @@ namespace SecondApp
             */
             // directional light
             shader.SetVec3("dirLight.direction", new Vector3(-1.0f, -1.0f, -1.0f));
-            shader.SetVec3("dirLight.ambient", new Vector3(0.05f, 0.05f, 0.05f));
-            shader.SetVec3("dirLight.diffuse", new Vector3(0.1f, 0.1f, 0.1f));
+            shader.SetVec3("dirLight.ambient", new Vector3(0.1f, 0.1f, 0.1f));
+            shader.SetVec3("dirLight.diffuse", new Vector3(0.6f, 0.6f, 0.6f));
             shader.SetVec3("dirLight.specular", new Vector3(0.3f, 0.3f, 0.3f));
             // point light 1
             shader.SetVec3("pointLights[0].position", new Vector3(20.0f, -10.0f, 20.0f));
             shader.SetVec3("pointLights[0].ambient", new Vector3(0.0f, 0.0f, 0.0f));
-            shader.SetVec3("pointLights[0].diffuse", new Vector3(0.8f, 0.8f, 0.8f));
-            shader.SetVec3("pointLights[0].specular", new Vector3(0.6f, 0.6f, 0.6f));
+            shader.SetVec3("pointLights[0].diffuse", new Vector3(3.0f, 3.0f, 3.0f));
+            shader.SetVec3("pointLights[0].specular", new Vector3(0.5f, 0.5f, 0.5f));
             shader.SetFloat("pointLights[0].constant", 1.0f);
-            shader.SetFloat("pointLights[0].linear", 0.027f);
-            shader.SetFloat("pointLights[0].quadratic", 0.0028f);
+            shader.SetFloat("pointLights[0].linear", 0.09f);
+            shader.SetFloat("pointLights[0].quadratic", 0.006f);
             // spotLight
             shader.SetVec3("spotLight.position", camera.position);
             shader.SetVec3("spotLight.direction", camera.front);
@@ -177,7 +198,7 @@ namespace SecondApp
             base.OnRenderFrame(e);
 
             //Console.WriteLine("Frame");
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
             Matrix4 viewMatrix;
 
@@ -268,23 +289,41 @@ namespace SecondApp
                 shader.SetVec3("spotLight.direction", camera.front);
                 shader.SetVec3("pointLights[0].position", cubeLight1.Position);
 
+                outlineShader.Use();
+                outlineShader.SetMatrix4("projection", projectionMatrix);
+                outlineShader.SetMatrix4("view", viewMatrix);
+
                 cubeLightShader.Use();
                 cubeLightShader.SetMatrix4("projection", projectionMatrix);
                 cubeLightShader.SetMatrix4("view", viewMatrix);
             }
 
 
+            // GL.StencilOpSeparate() kad ne zelimo da se providi
+            //GL.Enable(EnableCap.DepthTest);
+            GL.StencilMask(0x00);
+            lineShader.Use();
             lineX.Draw();
             lineY.Draw();
             lineZ.Draw();
-
             shader.Use();
-            model.Draw(shader);
             sponza.Draw(shader);
-            //sponza.Rotate(MathHelper.DegreesToRadians((float)e.Time) * 10);
-            lopta.Draw(shader);
-
+            cubeLightShader.Use();
             cubeLight1.Draw();
+
+            GL.StencilFunc(StencilFunction.Always, 1, 0xFF);
+            GL.StencilMask(0xFF);
+            shader.Use();
+            nanosuit.Draw(shader);
+
+            GL.StencilFunc(StencilFunction.Notequal, 1, 0xFF);
+            GL.StencilMask(0x00);
+            //GL.Disable(EnableCap.DepthTest);
+            outlineShader.Use();
+            nanosuit.Draw(outlineShader);
+            GL.StencilMask(0xFF);
+            //GL.Enable(EnableCap.DepthTest);
+
 
             Context.SwapBuffers();
             //Console.WriteLine("\n\n\n\n");

@@ -119,10 +119,10 @@ void draw_default()
 { 
 	if(texture_diffuse_count > 0){
 		vec4 texColor = texture(texture_diffuse1, TexCoords);
-		if(texColor.a == 0.0) {
-			discard;
-			return;
-		}
+		//if(texColor.a == 0.0) {
+			//discard;
+			//return;
+		//}
 		material_diffuse_pixel = vec3(texColor);
 	}
 	else{
