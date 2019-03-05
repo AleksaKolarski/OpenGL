@@ -100,6 +100,8 @@ namespace SecondApp
             GL.DepthFunc(DepthFunction.Less);
             GL.Enable(EnableCap.StencilTest);
             GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Replace);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             lineShader = new Shader("LineShader.vert", "LineShader.frag");
             float[] lineXVertices =
@@ -265,6 +267,11 @@ namespace SecondApp
                 {
                     shader.Use();
                     shader.SetInt("mode", 3);
+                }
+                if (Keyboard.checkKey(Key.Keypad5))
+                {
+                    shader.Use();
+                    shader.SetInt("mode", 4);
                 }
 
                 Mouse.updateState(Width, Height);

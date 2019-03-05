@@ -24,6 +24,7 @@ namespace SecondApp
             GL.BindTexture(TextureTarget.Texture2D, texture);
             Use();
 
+
             Image<Rgba32> image = Image.Load(path);
 
 
