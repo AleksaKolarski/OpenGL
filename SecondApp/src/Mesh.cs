@@ -20,17 +20,21 @@ namespace SecondApp
 
     class Mesh
     {
+        string name;
         VertexStruct[] vertices;
         int[] indices;
         TextureStruct[] textures;
         int VAO, VBO, EBO;
 
-        public Mesh(VertexStruct[] vertices, int[] indices, TextureStruct[] textures)
+        Matrix4 modelMatrix = Matrix4.Identity;
+
+        public Mesh(string name, VertexStruct[] vertices, int[] indices, TextureStruct[] textures)
         {
+            this.name = name;
             this.vertices = vertices;
             this.indices = indices;
             this.textures = textures;
-
+            
             setupMesh();
         }
 
@@ -41,23 +45,52 @@ namespace SecondApp
             for (int i = 0; i < textures.Length; i++){
                 GL.ActiveTexture(TextureUnit.Texture0 + i);
                 string number = "";
-                string name = textures[i].type;
-                if(name == "texture_diffuse")
+                string uniformName = textures[i].type;
+                if(uniformName == "texture_diffuse")
                 {
                     number = (diffuseNr++).ToString();
                 }
-                else if(name == "texture_specular")
+                else if(uniformName == "texture_specular")
                 {
                     number = (specularNr++).ToString();
                 }
-                shader.SetFloat("material." + name + number, i);
+                shader.SetInt(uniformName + number, i);
+                
                 GL.BindTexture(TextureTarget.Texture2D, textures[i].id);
+                //System.Console.WriteLine("Binding "+ uniformName + " texture " + textures[i].path);
             }
-            GL.ActiveTexture(TextureUnit.Texture0);
+            shader.SetInt("texture_diffuse_count", diffuseNr-1);
+            shader.SetInt("texture_specular_count", specularNr - 1);
+            //if (diffuseNr == 1)
+            //{
+                //System.Console.WriteLine("Mesh " + name + " contains no diffuse textures");
+            //}
+            //if(specularNr == 1)
+            //{
+                //System.Console.WriteLine("Mesh " + name + " contains no specular textures");
+            //}
+
+            shader.SetMatrix4("model", modelMatrix);
 
             GL.BindVertexArray(VAO);
             GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
             GL.BindVertexArray(0);
+            GL.ActiveTexture(TextureUnit.Texture0);
+        }
+
+        public void Scale(float scale)
+        {
+            modelMatrix *= Matrix4.CreateScale(scale);
+        }
+
+        public void Translate(Vector3 translation)
+        {
+            modelMatrix *= Matrix4.CreateTranslation(translation);
+        }
+
+        public void Rotate(float angle)
+        {
+            modelMatrix *= Matrix4.CreateRotationY(angle);
         }
 
         private void setupMesh()
@@ -69,21 +102,25 @@ namespace SecondApp
             GL.BindVertexArray(VAO);
             
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, Marshal.SizeOf(vertices), vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, Marshal.SizeOf(typeof(VertexStruct)) * vertices.Length, vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, Marshal.SizeOf(indices), indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(int) * indices.Length, indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(new VertexStruct()), 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(VertexStruct)), 0);
 
             GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(new VertexStruct()), Marshal.OffsetOf(typeof(VertexStruct), "Normal"));
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(VertexStruct)), Marshal.OffsetOf(typeof(VertexStruct), "Normal"));
 
             GL.EnableVertexAttribArray(2);
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, Marshal.SizeOf(new VertexStruct()), Marshal.OffsetOf(typeof(VertexStruct), "TexCoords"));
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(VertexStruct)), Marshal.OffsetOf(typeof(VertexStruct), "TexCoords"));
 
             GL.BindVertexArray(0);
+
+            modelMatrix = Matrix4.Identity;
+            //modelMatrix *= Matrix4.CreateScale(0.1f);
+            //modelMatrix *= Matrix4.CreateTranslation(new Vector3(VAO * 3, VAO * 3, VAO * 3));
         }
     }
 }

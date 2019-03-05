@@ -7,9 +7,10 @@ namespace SecondApp
 {
     class Model
     {
-        List<Mesh> meshes;
+        List<Mesh> meshes = new List<Mesh>();
         string directory;
-        List<TextureStruct> textures_loaded;
+        List<TextureStruct> textures_loaded = new List<TextureStruct>();
+
 
         public Model(string path)
         {
@@ -25,14 +26,38 @@ namespace SecondApp
             }
         }
 
+        public void Scale(float scale)
+        {
+            foreach(Mesh mesh in meshes)
+            {
+                mesh.Scale(scale);
+            }
+        }
+
+        public void Translate(Vector3 translation)
+        {
+            foreach(Mesh mesh in meshes)
+            {
+                mesh.Translate(translation);
+            }
+        }
+
+        public void Rotate(float angle)
+        {
+            foreach(Mesh mesh in meshes)
+            {
+                mesh.Rotate(angle);
+            }
+        }
+
         void loadModel(string path)
         {
             using(AssimpContext context = new AssimpContext())
             {
-                Scene scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs);
+                Scene scene = context.ImportFile(path, PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateNormals);
                 if(scene == null || (scene.SceneFlags & SceneFlags.Incomplete) == SceneFlags.Incomplete  || scene.RootNode == null)
                 {
-                    System.Console.WriteLine("Greska pri ucitavanju " + path + ": " + AssimpLibrary.Instance.GetErrorString());
+                    System.Console.WriteLine("Greska pri ucitavanju " + path);
                     return;
                 }
                 directory = path.Substring(0, path.LastIndexOf('/'));
@@ -58,6 +83,7 @@ namespace SecondApp
             List<VertexStruct> vertices = new List<VertexStruct>();
             List<int> indices = new List<int>();
             List<TextureStruct> textures = new List<TextureStruct>();
+            
 
             // process vertices
             for(int i = 0; i < mesh.VertexCount; i++)
@@ -66,8 +92,11 @@ namespace SecondApp
                 Vector3 vector3;
                 vector3 = new Vector3(mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z);
                 vertex.Position = vector3;
-                vector3 = new Vector3(mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z);
-                vertex.Normal = vector3;
+                if (mesh.HasNormals)
+                {
+                    vector3 = new Vector3(mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z);
+                    vertex.Normal = vector3;
+                }
                 if (mesh.HasTextureCoords(0))
                 {
                     Vector2 vector2 = new Vector2();
@@ -108,7 +137,7 @@ namespace SecondApp
                 }
             }
 
-            return new Mesh(vertices.ToArray(), indices.ToArray(), textures.ToArray());
+            return new Mesh(mesh.Name, vertices.ToArray(), indices.ToArray(), textures.ToArray());
         }
 
         TextureStruct[] loadMaterialTextures(Material material, TextureType type, string typeName)
@@ -120,7 +149,7 @@ namespace SecondApp
                 material.GetMaterialTexture(type, i, out textureSlot);
 
                 bool skip = false;
-                for(int j = 0; j < textures_loaded.Count; j++)
+                for (int j = 0; j < textures_loaded.Count; j++)
                 {
                     if (textures_loaded[j].path.Equals(textureSlot.FilePath))
                     {
@@ -132,10 +161,11 @@ namespace SecondApp
                 if(skip == false)
                 {
                     TextureStruct texture = new TextureStruct();
-                    texture.id = new Texture(textureSlot.FilePath).texture;
+                    texture.id = new Texture(directory + "/" + textureSlot.FilePath).texture;
                     texture.type = typeName;
                     texture.path = textureSlot.FilePath;
                     textures.Add(texture);
+                    textures_loaded.Add(texture);
                 }
             }
             return textures.ToArray();

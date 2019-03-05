@@ -83,7 +83,7 @@ namespace SecondApp
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
-                Console.WriteLine("shader.SetInt("+name+", "+value+") greska");
+                //Console.WriteLine("shader.SetInt("+name+", "+value+") greska");
             }
             GL.Uniform1(location, value);
         }
@@ -93,7 +93,7 @@ namespace SecondApp
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
-                Console.WriteLine("shader.SetFloat(" + name + ", " + value + ") greska");
+                //Console.WriteLine("shader.SetFloat(" + name + ", " + value + ") greska");
             }
             GL.Uniform1(location, value);
         }
@@ -103,7 +103,7 @@ namespace SecondApp
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
-                Console.WriteLine("shader.SetVec3(" + name + ", " + value + ") greska");
+                //Console.WriteLine("shader.SetVec3(" + name + ", " + value + ") greska");
             }
             GL.Uniform3(location, value);
         }
@@ -113,7 +113,7 @@ namespace SecondApp
             int location = GetCachedUniformLocation(name);
             if (location == -1)
             {
-                Console.WriteLine("shader.SetMatrix4(" + name + ", " + value + ") greska");
+                //Console.WriteLine("shader.SetMatrix4(" + name + ", " + value + ") greska");
             }
             GL.UniformMatrix4(location, false, ref value);
         }

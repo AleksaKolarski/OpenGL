@@ -42,12 +42,11 @@ namespace SecondApp
             GL.EnableVertexAttribArray(vertexAttribLocation);
         }
 
-        public void Draw(Matrix4 viewMatrix)
+        public void Draw()
         {
             GL.BindVertexArray(VAO);
             Shader.Use();
             Shader.SetMatrix4("model", Model);
-            Shader.SetMatrix4("view", viewMatrix);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
         }
 
