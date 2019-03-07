@@ -329,11 +329,16 @@ namespace SecondApp
             lopta.Scale(0.2f);
             lopta.Translate(new Vector3((float)Math.Sin(broj) * 2.0f, 1.0f, (float)Math.Cos(broj) * 2.0f));
 
+
+            
+
+            // GL.StencilOpSeparate() kad ne zelimo da se providi
+            //GL.Enable(EnableCap.DepthTest);
+            GL.StencilMask(0x00);
             GL.DepthMask(false);
             skyboxShader.Use();
             skybox.Draw();
             GL.DepthMask(true);
-
             lineShader.Use();
             lineX.Draw();
             lineY.Draw();
@@ -343,13 +348,26 @@ namespace SecondApp
             football.Draw(shader);
             cubeLightShader.Use();
             lopta.Draw(cubeLightShader);
+            
+
+            GL.StencilFunc(StencilFunction.Always, 1, 0xFF);
+            GL.StencilMask(0xFF);
             shader.Use();
             nanosuit.Draw(shader);
 
+            GL.StencilFunc(StencilFunction.Notequal, 1, 0xFF);
+            GL.StencilMask(0x00);
+            //GL.Disable(EnableCap.DepthTest);
+            outlineShader.Use();
+            nanosuit.Scale(0.12f);
+            nanosuit.Draw(outlineShader);
+            GL.StencilMask(0xFF);
+            //GL.Enable(EnableCap.DepthTest);
+
 
             Context.SwapBuffers();
-
             //Console.WriteLine("\n\n\n\n");
+
             //Console.ReadLine();
         }
 
