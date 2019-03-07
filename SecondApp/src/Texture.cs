@@ -21,7 +21,7 @@ namespace SecondApp
         {
             texture = GL.GenTexture();
 
-            GL.BindTexture(TextureTarget.Texture2D, texture);
+            //GL.BindTexture(TextureTarget.Texture2D, texture);
             Use();
 
 

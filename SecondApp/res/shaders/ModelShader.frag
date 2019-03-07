@@ -103,7 +103,7 @@ void draw_depth(){
 	float z;
 
 	z = gl_FragCoord.z * 2.0 - 1.0;
-	depth = (2.0 * 0.1 * 400.0) / (400.0 + 0.1 - z * (400.0 - 0.1)) / 400.0;
+	depth = (2.0 * 0.1 * 100.0) / (100.0 + 0.1 - z * (100.0 - 0.1)) / 100.0;
 
 	FragColor = vec4(vec3(depth), 1.0);
 }
@@ -115,10 +115,10 @@ void draw_normals(){
 
 void draw_specular(){
 	if(texture_specular_count > 0){
-		FragColor = vec4(texture(texture_specular1, TexCoords));
+		FragColor = vec4(texture(texture_specular1, TexCoords).xyz, 1.0f);
 	}
 	else{
-		FragColor = vec4(0.0f);
+		FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 }
 
@@ -128,14 +128,14 @@ void draw_light()
 		material_diffuse_pixel = vec4(texture(texture_diffuse1, TexCoords));
 	}
 	else{
-		material_diffuse_pixel = vec4(0.0f);
+		material_diffuse_pixel = vec4(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 
 	if(texture_specular_count > 0){
 		material_specular_pixel = vec3(texture(texture_specular1, TexCoords));
 	}
 	else{
-		material_specular_pixel = vec3(0.0f);
+		material_specular_pixel = vec3(0.0f, 0.0f, 0.0f);
 	}
 
     
@@ -159,7 +159,6 @@ void draw_light()
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
     
     FragColor = vec4(result, material_diffuse_pixel.w); 
-	//FragColor = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1.0);
 }
 
 

@@ -11,6 +11,8 @@ namespace SecondApp
         string directory;
         List<TextureStruct> textures_loaded = new List<TextureStruct>();
 
+        public Vector3 Position { get; private set; }
+
 
         public Model(string path)
         {
@@ -36,6 +38,7 @@ namespace SecondApp
 
         public void Translate(Vector3 translation)
         {
+            Position = translation;
             foreach(Mesh mesh in meshes)
             {
                 mesh.Translate(translation);
@@ -125,6 +128,7 @@ namespace SecondApp
             if(mesh.MaterialIndex >= 0)
             {
                 Material material = scene.Materials[mesh.MaterialIndex];
+                //System.Console.WriteLine(material.Name + " " + material.ShadingMode);
                 TextureStruct[] diffuseMaps = loadMaterialTextures(material, TextureType.Diffuse, "texture_diffuse");
                 for(int i = 0; i < diffuseMaps.Length; i++)
                 {

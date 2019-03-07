@@ -76,6 +76,7 @@ namespace SecondApp
             GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
             GL.BindVertexArray(0);
             GL.ActiveTexture(TextureUnit.Texture0);
+            modelMatrix = Matrix4.Identity;
         }
 
         public void Scale(float scale)
@@ -119,8 +120,7 @@ namespace SecondApp
             GL.BindVertexArray(0);
 
             modelMatrix = Matrix4.Identity;
-            //modelMatrix *= Matrix4.CreateScale(0.1f);
-            //modelMatrix *= Matrix4.CreateTranslation(new Vector3(VAO * 3, VAO * 3, VAO * 3));
+            
         }
     }
 }
